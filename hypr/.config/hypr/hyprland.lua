@@ -12,6 +12,7 @@ local terminal = "uwsm app -- kitty"
 local fileManager = "uwsm app -- thunar"
 local menu = "uwsm app -- wofi --show drun --prompt='Programs'"
 local locker = "hyprlock"
+local logout = "hyprshutdown"
 
 ------------------
 ---- MONITORS ----
@@ -140,7 +141,7 @@ local mainMod = "SUPER"
 -- core
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + M", hl.dsp.exit())
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(logout))
 
 -- apps
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
