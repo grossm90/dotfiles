@@ -1,0 +1,8 @@
+catppuccin-gtk-theme-mocha
+electron37
+firmware-manager-git
+openssl-1.0
+paru
+paru-debug
+system76-driver
+zen-browser-bin
