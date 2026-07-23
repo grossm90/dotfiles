@@ -1,0 +1,53 @@
+{
+	"layer": "top",
+	"modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+	"modules-right": ["network", "pulseaudio", "battery", "custom/power"],
+	
+	"pulseaudio": {
+		"tooltip": false,
+		"scroll-step": 1,
+		"format": "{icon} {volume}%",
+		"format-muted": "{icon} {volume}%",
+		"on-click":"pactl set-sink-mute @DEFAULT_SINK@ toggle",
+		"format-icons": {
+			"default": ["", "", ""]
+		}
+	},
+
+	"hyprland-workspaces": {
+		"num-tags": 6
+	},
+
+	"network": {
+		"tooltip": false,
+		"format-wifi": "  {essid}",
+		"format-ethernet": "",
+		"on-click": "kitty nmtui"
+	},
+	
+	"battery": {
+		"states": {
+            "good": 95,
+			"warning": 30,
+            "critical": 20
+        	},
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt": "{time} {icon}",
+        "format-icons": ["", "", "", "", ""]
+	},
+    	
+	"clock": {
+		"tooltip": false,
+        	"format": "{:%d | %H:%M}"
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "tooltip": false,
+        "on-click": "~/.config/hypr/scripts/powermenu.sh"
+    },
+
+}
