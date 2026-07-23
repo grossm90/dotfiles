@@ -16,6 +16,7 @@
 	},
 
 	"hyprland-workspaces": {
+        "on-click": "activate",
 		"num-tags": 6
 	},
 
