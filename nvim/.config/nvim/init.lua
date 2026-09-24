@@ -38,6 +38,8 @@ vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80"
 
+vim.env.FIREFOX_PATH = "/usr/bin/zen-browser"
+
 -- Make .p8 files use Lua filetype
 vim.filetype.add({
   extension = {

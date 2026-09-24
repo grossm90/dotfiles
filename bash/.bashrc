@@ -12,4 +12,6 @@ alias grep='grep --color=auto'
 PS1='[\u@\h \W]\$ '
 source /usr/share/nvm/init-nvm.sh
 
+export FIREFOX_PATH=/usr/bin/zen-browser
+
 export PATH="$HOME/.local/bin:$PATH"
