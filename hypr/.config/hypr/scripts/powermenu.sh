@@ -16,10 +16,10 @@ case "$choice" in
         systemctl suspend
         ;;
     Reboot)
-        hyprshutdown -t "Restarting..." --post-cmd "systemctl reboot"
+        hyprshutdown --no-exit --no-fork -t "Restarting..." && systemctl reboot
         ;;
     Shutdown)
-        hyprshutdown -t "Shutting down..." --post-cmd "systemctl poweroff"
+        hyprshutdown --no-exit --no-fork -t "Shutting down..." && systemctl poweroff
         ;;
     Logout)
         hyprshutdown -t "Logging out..."

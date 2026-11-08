@@ -37,9 +37,6 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -------------------
 
 hl.on("hyprland.start", function()
-    -- system / session
-    hl.exec_cmd("uwsm app -- dbus-update-activation-environment --all")
-    hl.exec_cmd("uwsm app -- gnome-keyring-daemon --start --components=secrets")
     hl.exec_cmd("uwsm app -- udiskie")
     -- desktop components
     hl.exec_cmd("uwsm app -- waybar")
