@@ -2,7 +2,7 @@
 	"layer": "top",
 	"modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-	"modules-right": ["network", "pulseaudio", "battery", "custom/power"],
+	"modules-right": ["network", "bluetooth", "pulseaudio", "battery", "custom/power"],
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -27,6 +27,17 @@
 		"on-click": "kitty nmtui"
 	},
 	
+	"bluetooth": {
+		"tooltip": false,
+		"format": "",
+		"format-off": " off",
+		"format-disabled": " off",
+		"format-connected": " {device_alias}",
+		"format-connected-battery": " {device_alias} {device_battery_percentage}%",
+		"on-click": "kitty bluetui",
+		"on-click-right": "bluetoothctl show | grep -q 'Powered: yes' && bluetoothctl power off || bluetoothctl power on"
+	},
+
 	"battery": {
 		"states": {
             "good": 95,

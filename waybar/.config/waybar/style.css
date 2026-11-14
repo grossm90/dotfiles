@@ -65,6 +65,7 @@ button:hover {
 #wireplumber,
 #tray,
 #network,
+#bluetooth,
 #mode,
 #scratchpad, 
 #custom-power {
@@ -93,6 +94,17 @@ button:hover {
 #network {
     color: @peach;
     border-bottom: 2px solid @peach;
+}
+
+#bluetooth {
+    color: @blue;
+    border-bottom: 2px solid @blue;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+    color: @overlay0;
+    border-bottom: 2px solid @overlay0;
 }
 
 #idle_inhibitor {
