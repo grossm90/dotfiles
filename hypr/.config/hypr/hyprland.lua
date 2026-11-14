@@ -18,9 +18,25 @@ local logout = "hyprshutdown"
 ---- MONITORS ----
 ------------------
 
+-- 48 Hz on battery, 60 Hz on AC. This runs whenever the config is loaded or
+-- reloaded; scripts/power-watch.sh applies the same rule live when the
+-- charger is plugged in or unplugged. Keep the two in sync.
+local function on_battery()
+    local f = io.open("/sys/class/power_supply/BAT0/status", "r")
+    if not f then
+        return false
+    end
+    local status = f:read("*l")
+    f:close()
+    return status == "Discharging"
+end
+
+local ok, battery = pcall(on_battery)
+local refresh = (ok and battery) and 48 or 60
+
 hl.monitor({
     output = "eDP-1",
-    mode = "1920x1200@60",
+    mode = "1920x1200@" .. refresh,
     position = "auto",
     scale = 1.2,
 })
@@ -42,6 +58,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm app -- waybar")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- hyprpaper")
+    -- battery/AC power profile and refresh rate
+    hl.exec_cmd("uwsm app -- " .. os.getenv("HOME") .. "/.config/hypr/scripts/power-watch.sh")
 
     -- startup workflow
     hl.exec_cmd("[workspace 1] " .. terminal)
