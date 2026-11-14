@@ -54,6 +54,7 @@ paru
 paru-debug
 pavucontrol
 pipewire-pulse
+playerctl
 poppler
 python-pypdf
 python-reportlab
