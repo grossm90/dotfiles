@@ -1,8 +1,10 @@
 catppuccin-gtk-theme-mocha
-electron37
+claude-desktop
 firmware-manager-git
-openssl-1.0
+hyprlogin-git
+marp-cli
 paru
 paru-debug
 system76-driver
+system76-power
 zen-browser-bin
