@@ -9,9 +9,7 @@ hl.monitor({
 
 hl.config({
     input = {
-        kb_layout  = "us,fr",
-        kb_variant = ",azerty",
-        kb_options = "grp:alt_shift_toggle",
+        kb_layout = "us",
     },
 })
 
