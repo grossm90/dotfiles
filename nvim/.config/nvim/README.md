@@ -197,8 +197,13 @@ lazy.nvim picks up every file in that folder.
   format-on-save on, delete the marked block near the top of the `config`
   function in `plugins/lsp.lua`. `:autocmd Conform` shows whether it is
   active: an empty list means off.
-- **`pico8-ls` is not managed by Mason.** It has to be on your `PATH` for
-  `.p8` files to get code intelligence.
+- **PICO-8 has two language server setups, and only one is used.** The block
+  in `init.lua` is the one that works: it treats `.p8` files as Lua and
+  starts `pico8-ls` itself. Because `pico8-ls` is installed through Mason, a
+  second ready-made config (`pico8_ls`) is also switched on. It looks for a
+  `p8` file type that never occurs here, so it sits idle and
+  `:checkhealth vim.lsp` warns "Unknown filetype 'p8'". The warning is
+  harmless.
 - **The leader key is set twice,** in `config/lazy.lua` and `config/remap.lua`.
   Both set it to Space, so it is harmless.
 - **`Ctrl-k` is next and `Ctrl-j` is previous** in the quickfix list, which is
