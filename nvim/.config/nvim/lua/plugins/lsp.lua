@@ -26,6 +26,9 @@ return {
     },
 
     config = function()
+        -- NOTE: this second conform.setup() call resets conform's autocommands,
+        -- which switches off the format_on_save set in plugins/conform.lua.
+        -- Delete this block to turn format-on-save back on.
         require("conform").setup({
             formatters_by_ft = {
             }
@@ -40,53 +43,46 @@ return {
 
         require("fidget").setup({})
         require("mason").setup()
+        -- Settings for every language server.
+        vim.lsp.config("*", {
+            capabilities = capabilities,
+        })
+
+        -- Per-server settings. These only take effect for servers that are
+        -- installed (see :Mason); mason-lspconfig switches those on itself.
+        vim.lsp.config("lua_ls", {
+            settings = {
+                Lua = {
+                    format = {
+                        enable = true,
+                        -- Put format options here
+                        -- NOTE: the value should be STRING!!
+                        defaultConfig = {
+                            indent_style = "space",
+                            indent_size = "2",
+                        }
+                    },
+                }
+            }
+        })
+
+        vim.lsp.config("zls", {
+            root_markers = { ".git", "build.zig", "zls.json" },
+            settings = {
+                zls = {
+                    enable_inlay_hints = true,
+                    enable_snippets = true,
+                    warn_style = true,
+                },
+            },
+        })
+        vim.g.zig_fmt_parse_errors = 0
+        vim.g.zig_fmt_autosave = 0
+
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
             },
-            handlers = {
-                function(server_name) -- default handler (optional)
-                    require("lspconfig")[server_name].setup {
-                        capabilities = capabilities
-                    }
-                end,
-
-                zls = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.zls.setup({
-                        root_dir = lspconfig.util.root_pattern(".git", "build.zig", "zls.json"),
-                        settings = {
-                            zls = {
-                                enable_inlay_hints = true,
-                                enable_snippets = true,
-                                warn_style = true,
-                            },
-                        },
-                    })
-                    vim.g.zig_fmt_parse_errors = 0
-                    vim.g.zig_fmt_autosave = 0
-
-                end,
-                ["lua_ls"] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.lua_ls.setup {
-                        capabilities = capabilities,
-                        settings = {
-                            Lua = {
-                                format = {
-                                    enable = true,
-                                    -- Put format options here
-                                    -- NOTE: the value should be STRING!!
-                                    defaultConfig = {
-                                        indent_style = "space",
-                                        indent_size = "2",
-                                    }
-                                },
-                            }
-                        }
-                    }
-                end,
-            }
         })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -104,7 +100,6 @@ return {
                 ["<C-Space>"] = cmp.mapping.complete(),
             }),
             sources = cmp.config.sources({
-                { name = "copilot", group_index = 2 },
                 { name = 'nvim_lsp' },
                 { name = 'luasnip' }, -- For luasnip users.
             }, {

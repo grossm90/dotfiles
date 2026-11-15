@@ -27,10 +27,20 @@ These are defined in `lua/config/remap.lua` unless a different file is named.
 | Keys | Mode | What it does |
 |---|---|---|
 | `<leader>pv` | normal | Opens the built-in file browser (netrw) in the current file's folder. "pv" is "project view". |
+| `<leader>pf` | normal | Fuzzy-finds a file by name, starting from the folder Neovim was opened in. "pf" is "project files". |
+| `Ctrl-p` | normal | The same, but only files tracked by git. Gives an error outside a git repository. |
+| `<leader>ps` | normal | Asks for some text, then lists every place it appears in the project. "ps" is "project search". |
+| `<leader>pb` | normal | Lists open buffers (files you have open) to switch between. |
+| `<leader>vh` | normal | Searches Neovim's help pages. |
+| `<leader>vk` | normal | Searches every key mapping, including the ones in this guide. |
 | `Ctrl-d` / `Ctrl-u` | normal | Scrolls half a page down / up and keeps the cursor line in the middle of the screen. |
 | `n` / `N` | normal | Next / previous search match, centred on screen. |
 | `Ctrl-k` / `Ctrl-j` | normal | Next / previous entry in the quickfix list (compiler errors, search results), centred. |
 | `<leader>k` / `<leader>j` | normal | Next / previous entry in the location list (a per-window quickfix list), centred. |
+
+The six finder keys are set in `lua/plugins/telescope.lua`. In a finder
+window, type to filter, `Ctrl-n` / `Ctrl-p` move through the results, `Enter`
+opens, and `Esc` twice closes.
 
 Inside the file browser: `Enter` opens, `-` goes up a folder, `%` creates a
 file, `d` creates a folder, `R` renames, `D` deletes.
@@ -43,7 +53,7 @@ file, `d` creates a folder, `R` renames, `D` deletes.
 | `J` | normal | Joins the next line onto this one, without moving the cursor. |
 | `=ap` | normal | Re-indents the current paragraph and puts the cursor back where it was. |
 | `<leader>s` | normal | Starts a find-and-replace for the word under the cursor across the whole file. Type the new text and press `Enter`. |
-| `<leader>f` | normal | Formats the current file (set in `lua/plugins/conform.lua`). Files are also formatted on every save. |
+| `<leader>f` | normal | Formats the current file (set in `lua/plugins/conform.lua`). |
 | `<leader>u` | normal | Opens the undo history tree (set in `lua/plugins/undotree.lua`). |
 | `Ctrl-c` | insert | Leaves insert mode, same as `Esc`. |
 | `Q` | normal | Disabled, so you can't fall into Ex mode by accident. |
@@ -137,19 +147,19 @@ lazy.nvim, set up in `lua/config/lazy.lua`.
 |---|---|---|
 | lazy.nvim | `config/lazy.lua` | Installs and updates the other plugins. Run `:Lazy` to see them; press `U` there to update, `q` to close. It checks for updates in the background and tells you when there are some. |
 | catppuccin | `plugins/catppuccin.lua` | The colour theme. |
-| telescope | `plugins/telescope.lua` | Fuzzy finder. **No keys are set for it**; use commands: `:Telescope find_files`, `:Telescope live_grep` (search text in all files), `:Telescope buffers`, `:Telescope help_tags`, `:Telescope keymaps`. |
+| telescope | `plugins/telescope.lua` | Fuzzy finder for files, text, buffers, help and key mappings. Keys are listed under [Files and navigation](#files-and-navigation). `:Telescope` followed by `Tab` shows everything else it can search. |
 | nvim-treesitter | `plugins/treesitter.lua` | Accurate syntax highlighting and indentation. The first time you open a new kind of file, it downloads the grammar for that language, then turns highlighting on. Needs the `tree-sitter-cli` package. |
 | undotree | `plugins/undotree.lua` | A visual history of every change, including branches that plain undo loses. `<leader>u` toggles it. |
-| conform | `plugins/conform.lua` | Code formatting, on save and with `<leader>f`. See the table below. |
-| nvim-lspconfig, mason, mason-lspconfig | `plugins/lsp.lua` | Language servers: errors as you type, go to definition, rename. `:Mason` opens an installer for servers and formatters. `lua_ls` (Lua) is installed automatically. |
+| conform | `plugins/conform.lua` | Code formatting with `<leader>f`. See the table below. |
+| nvim-lspconfig, mason, mason-lspconfig | `plugins/lsp.lua` | Language servers: errors as you type, go to definition, rename. `:Mason` opens an installer for servers and formatters. `lua_ls` (Lua) is installed automatically, and any server installed through Mason is switched on by itself. Per-server settings are the `vim.lsp.config(...)` blocks. |
 | nvim-cmp, LuaSnip, and the `cmp-*` plugins | `plugins/lsp.lua` | The completion menu. Suggestions come from the language server, snippets, and words in the current file. |
 | fidget | `plugins/lsp.lua` | Small progress messages in the bottom-right corner while a language server is working. |
 | marp.nvim | `plugins/marp.lua` | Preview and export Marp slide decks from Markdown. Type `:Marp` and press `Tab` to see its commands. Themes are read from `~/.local/marp/themes`, and the preview opens in Zen. |
 
 ### Formatters
 
-conform runs these when you save or press `<leader>f`. Each one is a separate
-program that has to be installed, through `:Mason` or `paru`.
+conform runs these when you press `<leader>f`. Each one is a separate program
+that has to be installed, through `:Mason` or `paru`.
 
 | File type | Formatter |
 |---|---|
@@ -159,7 +169,8 @@ program that has to be installed, through `:Mason` or `paru`.
 | JavaScript, TypeScript | `prettier` |
 | Anything else | The language server's own formatting, if it has any |
 
-A save waits up to 5 seconds for formatting to finish.
+Format-on-save is written into `plugins/conform.lua` but is currently switched
+off; see the first item under "Things that may surprise you".
 
 ## Where things live
 
@@ -180,19 +191,12 @@ lazy.nvim picks up every file in that folder.
 
 ## Things that may surprise you
 
-- **The custom language server settings in `lsp.lua` probably do nothing.**
-  The `handlers` block (the default handler, plus the `zls` and `lua_ls`
-  sections) uses a feature that mason-lspconfig removed in version 2.0. On
-  version 2 and later, installed servers are simply switched on with their
-  default settings. Language servers still work; only the custom settings in
-  that block are skipped. `:checkhealth vim.lsp` shows what is running.
-- **Telescope has no keys.** ThePrimeagen's usual `<leader>pf` and friends
-  were never added here. Use the `:Telescope` commands listed above.
-- **`<leader>y` needs a clipboard tool.** On Wayland that is the
-  `wl-clipboard` package. `:checkhealth` reports under "clipboard" whether
-  one was found.
-- **"copilot" is listed as a completion source, but Copilot is not
-  installed.** The entry is ignored.
+- **Format-on-save is configured but switched off.** `plugins/conform.lua`
+  asks for it, but `plugins/lsp.lua` calls conform's setup a second time,
+  which resets it. Formatting only happens when you press `<leader>f`. To turn
+  format-on-save on, delete the marked block near the top of the `config`
+  function in `plugins/lsp.lua`. `:autocmd Conform` shows whether it is
+  active: an empty list means off.
 - **`pico8-ls` is not managed by Mason.** It has to be on your `PATH` for
   `.p8` files to get code intelligence.
 - **The leader key is set twice,** in `config/lazy.lua` and `config/remap.lua`.
@@ -205,6 +209,6 @@ lazy.nvim picks up every file in that folder.
 | Command | What it shows |
 |---|---|
 | `:verbose nmap <leader>s` | What a normal-mode key is mapped to, and which file set it |
-| `:Telescope keymaps` | A searchable list of every mapping |
+| `<leader>vk` | A searchable list of every mapping |
 | `:help K` | The built-in meaning of a key (here, `K`) |
 | `:Tutor` | Neovim's built-in refresher lesson, about 30 minutes |
