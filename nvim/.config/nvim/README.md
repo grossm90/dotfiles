@@ -154,7 +154,7 @@ lazy.nvim, set up in `lua/config/lazy.lua`.
 | nvim-lspconfig, mason, mason-lspconfig | `plugins/lsp.lua` | Language servers: errors as you type, go to definition, rename. `:Mason` opens an installer for servers and formatters. `lua_ls` (Lua) is installed automatically, and any server installed through Mason is switched on by itself. Per-server settings are the `vim.lsp.config(...)` blocks. |
 | nvim-cmp, LuaSnip, and the `cmp-*` plugins | `plugins/lsp.lua` | The completion menu. Suggestions come from the language server, snippets, and words in the current file. |
 | fidget | `plugins/lsp.lua` | Small progress messages in the bottom-right corner while a language server is working. |
-| marp.nvim | `plugins/marp.lua` | Preview and export Marp slide decks from Markdown. Type `:Marp` and press `Tab` to see its commands. Themes are read from `~/.local/marp/themes`, and the preview opens in Zen. |
+| marp.nvim | `plugins/marp.lua` | Preview and export Marp slide decks from Markdown. Type `:Marp` and press `Tab` to see its commands. Themes are read from `~/.local/share/marp/themes` (installed by the `teaching-scripts` repo), and the preview opens in Zen. |
 
 ### Formatters
 
