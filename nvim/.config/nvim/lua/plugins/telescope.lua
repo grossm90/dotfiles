@@ -1,5 +1,6 @@
 return {
-	'nvim-telescope/telescope.nvim', tag = '0.1.8',
+	-- latest release; the old 0.1.8 pin calls a function Neovim has removed
+	'nvim-telescope/telescope.nvim', version = '*',
 	dependencies = { 'nvim-lua/plenary.nvim' },
 	config = function()
 		local builtin = require('telescope.builtin')
