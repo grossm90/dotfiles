@@ -15,6 +15,7 @@ Open this file from inside Neovim with `:e ~/.config/nvim/README.md`.
 - [Editor settings](#editor-settings)
 - [Plugins](#plugins)
 - [PICO-8](#pico-8)
+- [Todo lists](#todo-lists)
 - [Where things live](#where-things-live)
 - [Things that may surprise you](#things-that-may-surprise-you)
 - [Finding out what a key does](#finding-out-what-a-key-does)
@@ -155,6 +156,8 @@ lazy.nvim, set up in `lua/config/lazy.lua`.
 | nvim-lspconfig, mason, mason-lspconfig | `plugins/lsp.lua` | Language servers: errors as you type, go to definition, rename. `:Mason` opens an installer for servers and formatters. `lua_ls` (Lua) is installed automatically, and any server installed through Mason is switched on by itself. Per-server settings are the `vim.lsp.config(...)` blocks. |
 | nvim-cmp, LuaSnip, and the `cmp-*` plugins | `plugins/lsp.lua` | The completion menu. Suggestions come from the language server, snippets, and words in the current file. The signature-help source adds parameter hints. |
 | fidget | `plugins/lsp.lua` | Small progress messages in the bottom-right corner while a language server is working. |
+| checkmate.nvim | `plugins/checkmate.lua` | Todo-list files with checkboxes, `@tags`, counts and an archive. See [Todo lists](#todo-lists). |
+| todo-comments.nvim | `plugins/todo-comments.lua` | Highlights `TODO:`-style comments in code and lists them across the project. |
 | marp.nvim | `plugins/marp.lua` | Preview and export Marp slide decks from Markdown. Type `:Marp` and press `Tab` to see its commands. Themes are read from `~/.local/share/marp/themes` (installed by the `teaching-scripts` repo), and the preview opens in Zen. |
 
 ### Formatters
@@ -199,6 +202,74 @@ fails on a new machine, run `nvm install --lts` and then `:Mason`.
 
 A file's status is decided when it is first opened. If you add a cart to a
 folder while its `.lua` files are already open, reopen them (`:e`).
+
+## Todo lists
+
+Two plugins stand in for the VS Code Todo+ extension: checkmate.nvim for
+todo files, and todo-comments.nvim for `TODO` comments inside code.
+
+### Todo files
+
+A todo file is one named `TODO`, `todo`, `TODO.md`, `todo.md`, or ending in
+`.todo`. It is ordinary Markdown: headings for projects, checkboxes for
+tasks, and indentation for subtasks.
+
+```markdown
+# Luna
+
+## Player
+- [ ] Movement @priority(high)
+  - [x] Walk @done(11/25/26 10:02)
+  - [ ] Jump @started(11/25/26 10:15)
+- [c] Double jump
+
+## Archive
+- [x] Create the repo @done(11/25/26 09:50)
+```
+
+In Neovim the boxes are drawn as `☐` (to do), `✔` (done) and `✘`
+(cancelled), and a parent task shows a done/total count for its subtasks.
+On disk and on GitHub they stay `- [ ]`, `- [x]` and `- [c]`.
+
+Typing `- [ ]` and leaving insert mode makes a todo. Pressing `Enter` at the
+end of a todo starts the next one.
+
+All keys start with `<leader>T` and only work in a todo file. They are set in
+`lua/plugins/checkmate.lua`.
+
+| Keys | What it does |
+|---|---|
+| `<leader>Tn` | New todo on this line |
+| `<leader>Tt` | Toggle between to do and done |
+| `<leader>Tc` / `<leader>Tu` | Mark done / not done |
+| `<leader>Tx` | Mark cancelled |
+| `<leader>T=` / `<leader>T-` | Step forwards / backwards through the states |
+| `<leader>Ts` | Add or remove `@started` with the current time |
+| `<leader>Td` | Add or remove `@done` with the current time (also ticks the box) |
+| `<leader>Tp` | Add or remove `@priority`; pick low, medium or high |
+| `<leader>Tv` | Change the value of the `@tag` under the cursor |
+| `<leader>T]` / `<leader>T[` | Jump to the next / previous `@tag` on the todo |
+| `<leader>Ta` | Archive: move finished todos under the `## Archive` heading |
+| `<leader>TF` | Pick a todo in this file from a list |
+| `<leader>Tr` | Turn a todo back into plain text |
+| `<leader>TR` | Remove all `@tags` from a todo |
+
+The toggle, check and state keys also work on a visual selection of several
+todos. You can write any other `@tag` or `@tag(value)` by hand.
+
+Not available, compared with Todo+: elapsed time (`@lasted`), estimates
+(`@est`), the running timer, and whole-file statistics.
+
+### Todo comments in code
+
+Comments beginning with `TODO:`, `FIX:`, `HACK:`, `WARN:`, `PERF:`, `NOTE:`
+or `TEST:` are highlighted, in any language. The colon is required. Set in
+`lua/plugins/todo-comments.lua`.
+
+| Keys | What it does |
+|---|---|
+| `<leader>pt` | Lists every todo comment in the project in a finder. "pt" is "project todos". |
+| `]t` / `[t` | Jumps to the next / previous todo comment in the file. This replaces Neovim's built-in use of those keys for stepping through tag matches. |
 
 ## Where things live
 
