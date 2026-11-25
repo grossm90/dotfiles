@@ -14,6 +14,7 @@ Open this file from inside Neovim with `:e ~/.config/nvim/README.md`.
 - [Keys that come with Neovim but matter here](#keys-that-come-with-neovim-but-matter-here)
 - [Editor settings](#editor-settings)
 - [Plugins](#plugins)
+- [PICO-8](#pico-8)
 - [Where things live](#where-things-live)
 - [Things that may surprise you](#things-that-may-surprise-you)
 - [Finding out what a key does](#finding-out-what-a-key-does)
@@ -136,7 +137,7 @@ Set in `init.lua`.
 | `colorcolumn = "80"` | A vertical guide marks column 80. |
 | Transparent background | The `Normal` and `NormalFloat` backgrounds are cleared, so the terminal's background shows through. |
 | `FIREFOX_PATH` | Points at Zen, for the Marp slide preview. |
-| `.p8` files | Treated as Lua, and the PICO-8 language server (`pico8-ls`) is started for them. |
+| `.p8` files | Highlighted as Lua. See [PICO-8](#pico-8) for the rest. |
 
 ## Plugins
 
@@ -152,7 +153,7 @@ lazy.nvim, set up in `lua/config/lazy.lua`.
 | undotree | `plugins/undotree.lua` | A visual history of every change, including branches that plain undo loses. `<leader>u` toggles it. |
 | conform | `plugins/conform.lua` | Code formatting with `<leader>f`. See the table below. |
 | nvim-lspconfig, mason, mason-lspconfig | `plugins/lsp.lua` | Language servers: errors as you type, go to definition, rename. `:Mason` opens an installer for servers and formatters. `lua_ls` (Lua) is installed automatically, and any server installed through Mason is switched on by itself. Per-server settings are the `vim.lsp.config(...)` blocks. |
-| nvim-cmp, LuaSnip, and the `cmp-*` plugins | `plugins/lsp.lua` | The completion menu. Suggestions come from the language server, snippets, and words in the current file. |
+| nvim-cmp, LuaSnip, and the `cmp-*` plugins | `plugins/lsp.lua` | The completion menu. Suggestions come from the language server, snippets, and words in the current file. The signature-help source adds parameter hints. |
 | fidget | `plugins/lsp.lua` | Small progress messages in the bottom-right corner while a language server is working. |
 | marp.nvim | `plugins/marp.lua` | Preview and export Marp slide decks from Markdown. Type `:Marp` and press `Tab` to see its commands. Themes are read from `~/.local/share/marp/themes` (installed by the `teaching-scripts` repo), and the preview opens in Zen. |
 
@@ -165,6 +166,7 @@ that has to be installed, through `:Mason` or `paru`.
 |---|---|
 | C, C++ | `clang-format` (uses a `.clang-format` file if the project has one, otherwise LLVM style) |
 | Lua | `stylua` |
+| PICO-8 (carts and their modules) | the PICO-8 language server |
 | Go | `gofmt` |
 | JavaScript, TypeScript | `prettier` |
 | Anything else | The language server's own formatting, if it has any |
@@ -172,15 +174,42 @@ that has to be installed, through `:Mason` or `paru`.
 Format-on-save is written into `plugins/conform.lua` but is currently switched
 off; see the first item under "Things that may surprise you".
 
+## PICO-8
+
+This mirrors the VS Code setup (the `pico8-ls` extension with its workspace
+settings), using the same language server.
+
+**What counts as PICO-8 code:** a `.p8` cart, and any `.lua` file in the same
+folder as a cart. That covers a cart whose code is a list of `#include`
+lines, with the modules beside it. Lua files anywhere else, including this
+config, are ordinary Lua. The rule lives in `lua/config/pico8.lua`.
+
+In PICO-8 code:
+
+| Feature | Behaviour |
+|---|---|
+| Language server | `pico8-ls` runs, so `spr()`, `btn()` and the rest are known. The general Lua server stays out, so it doesn't flag PICO-8 syntax as errors. |
+| Completion | Suggestions appear as you type code, but not inside comments or strings. |
+| Parameter hints | While you type a call's arguments, the menu shows the function's parameters with the current one marked. This works in every language, not only PICO-8. `Ctrl-s` still shows the full signature on request. |
+| Documentation | `K` on a function shows its help. |
+| Formatting | `<leader>f` uses the PICO-8 server's formatter. Nothing is formatted on save or as you type. |
+
+`pico8-ls` is installed by Mason automatically. It needs Node; if the install
+fails on a new machine, run `nvm install --lts` and then `:Mason`.
+
+A file's status is decided when it is first opened. If you add a cart to a
+folder while its `.lua` files are already open, reopen them (`:e`).
+
 ## Where things live
 
 ```
 ~/.config/nvim/
-├── init.lua              editor settings, PICO-8 setup; loads the two files below
+├── init.lua              editor settings; loads the two files below
 ├── lua/
 │   ├── config/
 │   │   ├── lazy.lua      plugin manager setup; sets the leader key
-│   │   └── remap.lua     custom keys
+│   │   ├── remap.lua     custom keys
+│   │   └── pico8.lua     decides whether a file is PICO-8 code
 │   └── plugins/          one file per plugin (or group of plugins)
 ├── lazy-lock.json        exact plugin versions; rewritten on update, not in git
 └── README.md             this file
@@ -197,13 +226,6 @@ lazy.nvim picks up every file in that folder.
   format-on-save on, delete the marked block near the top of the `config`
   function in `plugins/lsp.lua`. `:autocmd Conform` shows whether it is
   active: an empty list means off.
-- **PICO-8 has two language server setups, and only one is used.** The block
-  in `init.lua` is the one that works: it treats `.p8` files as Lua and
-  starts `pico8-ls` itself. Because `pico8-ls` is installed through Mason, a
-  second ready-made config (`pico8_ls`) is also switched on. It looks for a
-  `p8` file type that never occurs here, so it sits idle and
-  `:checkhealth vim.lsp` warns "Unknown filetype 'p8'". The warning is
-  harmless.
 - **The leader key is set twice,** in `config/lazy.lua` and `config/remap.lua`.
   Both set it to Space, so it is harmless.
 - **`Ctrl-k` is next and `Ctrl-j` is previous** in the quickfix list, which is

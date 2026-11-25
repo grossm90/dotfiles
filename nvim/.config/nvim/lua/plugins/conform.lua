@@ -10,7 +10,14 @@ return {
 			formatters_by_ft = {
 				c = { "clang-format" },
 				cpp = { "clang-format" },
-				lua = { "stylua" },
+				lua = function(bufnr)
+					-- PICO-8 code is formatted by its own language server;
+					-- stylua does not understand PICO-8's shorthand.
+					if require("config.pico8").is_cart_buffer(bufnr) then
+						return { lsp_format = "prefer" }
+					end
+					return { "stylua" }
+				end,
 				go = { "gofmt" },
 				javascript = { "prettier" },
 				typescript = { "prettier" },
