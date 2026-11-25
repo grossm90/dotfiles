@@ -195,10 +195,16 @@ In PICO-8 code:
 | Completion | Suggestions appear as you type code, but not inside comments or strings. |
 | Parameter hints | While you type a call's arguments, the menu shows the function's parameters with the current one marked. This works in every language, not only PICO-8. `Ctrl-s` still shows the full signature on request. |
 | Documentation | `K` on a function shows its help. |
-| Formatting | `<leader>f` uses the PICO-8 server's formatter. Nothing is formatted on save or as you type. |
+| Formatting | `<leader>f` uses the PICO-8 server's formatter. It does nothing while the file has a syntax error. Nothing is formatted on save or as you type. |
 
 `pico8-ls` is installed by Mason automatically. It needs Node; if the install
 fails on a new machine, run `nvm install --lts` and then `:Mason`.
+
+A new `.lua` file created in a cart's folder is saved to disk immediately,
+empty. The server only knows about files it can find on disk, so without
+this it gives no suggestions until the first `:w`. For a new module to see
+the rest of the game's functions and variables, add its `#include` line to
+the cart.
 
 A file's status is decided when it is first opened. If you add a cart to a
 folder while its `.lua` files are already open, reopen them (`:e`).

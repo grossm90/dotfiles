@@ -46,4 +46,32 @@ function M.cart_dir(bufnr)
     return vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
 end
 
+-- The PICO-8 language server learns about files by scanning the folder on
+-- disk. A new, never-saved file is invisible to it, so it gives no
+-- suggestions there. Saving a new cart module as soon as it is created
+-- avoids that.
+function M.setup()
+    vim.api.nvim_create_autocmd("BufNewFile", {
+        pattern = "*.lua",
+        group = vim.api.nvim_create_augroup("pico8_save_new_modules", { clear = true }),
+        callback = function(args)
+            local buf = args.buf
+            vim.schedule(function()
+                if not vim.api.nvim_buf_is_valid(buf) or vim.bo[buf].buftype ~= "" then
+                    return
+                end
+                if not M.is_cart_buffer(buf) then
+                    return
+                end
+                if vim.uv.fs_stat(vim.api.nvim_buf_get_name(buf)) then
+                    return
+                end
+                vim.api.nvim_buf_call(buf, function()
+                    vim.cmd("silent! write")
+                end)
+            end)
+        end,
+    })
+end
+
 return M

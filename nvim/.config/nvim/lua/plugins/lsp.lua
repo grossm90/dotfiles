@@ -80,6 +80,14 @@ return {
         -- "lua" file type here, so the folder decides, not the file type.
         vim.lsp.config("pico8_ls", {
             filetypes = { "lua" },
+            -- The server only formats documents labelled with its own
+            -- language names; Neovim would otherwise send "lua".
+            get_language_id = function(bufnr)
+                if vim.api.nvim_buf_get_name(bufnr):match("%.p8$") then
+                    return "pico-8"
+                end
+                return "pico-8-lua"
+            end,
             root_dir = function(bufnr, on_dir)
                 if pico8.is_cart_buffer(bufnr) then
                     on_dir(pico8.cart_dir(bufnr))
@@ -104,6 +112,12 @@ return {
             ensure_installed = {
                 "lua_ls",
                 "pico8_ls",
+            },
+            -- stylua can run as a language server, and Mason would switch
+            -- it on for every Lua file, PICO-8 code included. It is used
+            -- as a plain formatter instead (plugins/conform.lua).
+            automatic_enable = {
+                exclude = { "stylua" },
             },
         })
 
