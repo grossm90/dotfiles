@@ -51,6 +51,7 @@ SYSTEM_UNITS=(
 USER_UNITS=(
     hyprpolkitagent.service
     gnome-keyring-daemon.socket
+    gcr-ssh-agent.socket
     pipewire-pulse.socket
     wireplumber.service
 )
