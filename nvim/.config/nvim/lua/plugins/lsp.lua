@@ -19,6 +19,7 @@ return {
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
         "hrsh7th/cmp-cmdline",
+        "hrsh7th/cmp-nvim-lsp-signature-help",
         "hrsh7th/nvim-cmp",
         "L3MON4D3/LuaSnip",
         "saadparwaiz1/cmp_luasnip",
@@ -35,6 +36,7 @@ return {
         })
         local cmp = require('cmp')
         local cmp_lsp = require("cmp_nvim_lsp")
+        local pico8 = require("config.pico8")
         local capabilities = vim.tbl_deep_extend(
             "force",
             {},
@@ -51,6 +53,14 @@ return {
         -- Per-server settings. These only take effect for servers that are
         -- installed (see :Mason); mason-lspconfig switches those on itself.
         vim.lsp.config("lua_ls", {
+            -- The general Lua server stays out of PICO-8 code, which it would
+            -- flag as full of errors. Everywhere else it starts as usual.
+            root_dir = function(bufnr, on_dir)
+                if pico8.is_cart_buffer(bufnr) then
+                    return
+                end
+                on_dir(vim.fs.root(bufnr, root_files))
+            end,
             settings = {
                 Lua = {
                     format = {
@@ -64,6 +74,17 @@ return {
                     },
                 }
             }
+        })
+
+        -- PICO-8: carts (.p8) and the .lua modules beside them. Both have the
+        -- "lua" file type here, so the folder decides, not the file type.
+        vim.lsp.config("pico8_ls", {
+            filetypes = { "lua" },
+            root_dir = function(bufnr, on_dir)
+                if pico8.is_cart_buffer(bufnr) then
+                    on_dir(pico8.cart_dir(bufnr))
+                end
+            end,
         })
 
         vim.lsp.config("zls", {
@@ -82,12 +103,35 @@ return {
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
+                "pico8_ls",
             },
         })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
         cmp.setup({
+            enabled = function()
+                -- nvim-cmp's own defaults: off in prompts and during macros
+                if vim.bo.buftype == "prompt" then
+                    return false
+                end
+                if vim.fn.reg_recording() ~= "" or vim.fn.reg_executing() ~= "" then
+                    return false
+                end
+
+                -- In PICO-8 code, stay quiet inside comments and strings.
+                if pico8.is_cart_buffer(0) then
+                    local context = require("cmp.config.context")
+                    if context.in_treesitter_capture("comment")
+                        or context.in_syntax_group("Comment")
+                        or context.in_treesitter_capture("string")
+                        or context.in_syntax_group("String") then
+                        return false
+                    end
+                end
+
+                return true
+            end,
             snippet = {
                 expand = function(args)
                     require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
@@ -100,6 +144,8 @@ return {
                 ["<C-Space>"] = cmp.mapping.complete(),
             }),
             sources = cmp.config.sources({
+                -- shows a function's parameters while you type its arguments
+                { name = 'nvim_lsp_signature_help' },
                 { name = 'nvim_lsp' },
                 { name = 'luasnip' }, -- For luasnip users.
             }, {
