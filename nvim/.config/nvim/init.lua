@@ -1,11 +1,6 @@
-require("config.lazy")
-require("config.remap")
-
--- Transparent Background
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-
--- Optional Settings
+-- Editor settings come first, before the plugins load. On a launch where the
+-- plugin manager opens its install window, settings applied afterwards (line
+-- numbers in particular) can land on that window instead of the editor.
 vim.opt.guicursor = ""
 
 vim.opt.nu = true
@@ -47,3 +42,15 @@ vim.filetype.add({
     p8 = "lua",
   },
 })
+
+-- New files in a cart's folder are saved straight away (see lua/config/pico8.lua).
+require("config.pico8").setup()
+
+-- Plugins and custom keys
+require("config.lazy")
+require("config.remap")
+
+-- Transparent background. Must come after the plugins so the colour theme
+-- does not override it.
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
